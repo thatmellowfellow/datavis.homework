@@ -1,4 +1,4 @@
-const width = 10000;
+const width = 1000;
 const barWidth = 500;
 const height = 500;
 const margin = 30;
