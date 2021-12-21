@@ -1,4 +1,4 @@
-const width = 10000;
+const width = 1000;
 const barWidth = 500;
 const height = 500;
 const margin = 30;
@@ -46,7 +46,7 @@ const colorScale = d3.scaleOrdinal().range(['#DD4949', '#39CDA1', '#FD710C', '#A
 const radiusScale = d3.scaleSqrt().range([10, 30]);
 
 loadData().then(data => {
-
+    console.log(data);
     colorScale.domain(d3.set(data.map(d=>d.region)).values());
 
     d3.select('#range').on('change', function(){ 
@@ -77,10 +77,53 @@ loadData().then(data => {
     });
 
     function updateBar(){
-        return;
+        const barData = d3.nest()
+        .key(d => d.region)
+        .rollup(leaves => {
+            return d3.mean(leaves.map(d => Number(d[param][year])))
+        }).entries(data);
+
+        console.log(barData);
+        const selection = barChart
+            .selectAll('rect')
+            .data(barData);
+
+        xBar.domain(barData.map(d => d.key));
+        yBar.domain(d3.extent(barData.map(d => d.value)));
+        const bars = selection.enter().append('rect');
+
+    selection.merge(bars)
+        .attr('x', d => xBar(d.key))
+        .attr('y', d => yBar(d.value))
+        .attr('height', d => height - yBar(d.value))
+        .attr('width', 100)
+        .transition().duration(400)
+        .attr('fill', d => colorScale(d.key))
     }
 
     function updateScattePlot(){
+        console.log(
+            //data.map(d => );
+        )
+        const xValues = data.map(d => Number(d[xParam][year])); //массив
+        const xDomain = d3.extent(xValues); // [min, max]
+        x.domain(xDomain); // [min, max] по xParam
+
+        const yValues = data.map(d => Number(d[yParam][year])); //массив
+        const yDomain = d3.extent(yValues); // [min, max]
+        y.domain(yDomain); // [min, max] по yParam
+
+        const selection = scatterPlot.selectAll('circle').data(data);
+
+        const circles = selection.enter()
+            .append('circle') //создаём элементы
+
+        selection.merge(circles)
+            .attr('r', 5)
+            .attr('cx', d => x(Number(d[xParam][year])))
+            .attr('cy', d => y(Number(d[yParam][year])))
+            .attr('fill', d => colorScale(d.region))
+
         return;
     }
 
