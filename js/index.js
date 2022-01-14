@@ -209,7 +209,7 @@ loadData().then(data => {
             var pickedCountry = d3.select(this)
                 .attr('country');
             d3.selectAll('circle')
-                .attr('stroke-width', 'default');
+                .attr('stroke-width', 'initial');
             d3.selectAll('circle')
                 .filter(d => d.country == pickedCountry)
                 .attr('stroke-width', 4)
